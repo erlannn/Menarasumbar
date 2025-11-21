@@ -1,19 +1,25 @@
 {
     "version": 2,
-    "functions": {
-        "api/index.php": { "runtime": "vercel-php@0.7.4" }
-    },
-    "routes": [
-        { "src": "/build/(.*)", "dest": "/public/build/" },
+    "builds": [
+        {
+          "src": "vite.config.js",
+          "use": "@vercel/static-build"
+        },
+        {
+          "src": "api/index.php",
+          "use": "vercel-php@0.7.4"
+        }
+      ],
+      "routes": [
+        { "src": "/build/(.*)", "dest": "/public/build/$1" },
         { "src": "/(.*)", "dest": "/api/index.php" }
-    ],
-    "public": true,
-    "buildCommand": "vite build",
+      ],
+    "buildCommand": "npm install && npm run build",
     "outputDirectory": "public",
     "env": {
         "APP_ENV": "production",
         "APP_DEBUG": "false",
-        "APP_URL": "http://localhost:8000",
+        "APP_URL": "https://menarasumbar.vercel.app",
         "APP_KEY": "base64:5HPkUddu0pKJ0vIEW9jzuL235XiC4CAyQWjHOs9whGA=",
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
