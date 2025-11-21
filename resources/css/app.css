@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@plugin "daisyui";
+
+@font-face {
+    font-family: 'Fontku';
+    src: url('/poppins/Poppins-Regular.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: 'Fontku', sans-serif;
+}
