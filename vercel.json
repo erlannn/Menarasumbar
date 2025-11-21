@@ -28,9 +28,9 @@
         "LOG_CHANNEL": "stack",
         "SESSION_DRIVER": "database",
         "DB_CONNECTION": "mysql",
-        "DB_HOST": "akw0bl.h.filess.io",
-        "DB_PORT": "3307",
-        "DB_DATABASE": "menarasumbar_todaywater",
-        "DB_USERNAME": "menarasumbar_todaywater"
+        "DB_HOST": "caboose.proxy.rlwy.net",
+        "DB_PORT": "49049",
+        "DB_DATABASE": "menarasumbar",
+        "DB_USERNAME": "root"
     }
 }
