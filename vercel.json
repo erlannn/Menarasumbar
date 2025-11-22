@@ -30,8 +30,8 @@
         "LOG_CHANNEL": "stack",
         "SESSION_DRIVER": "database",
         "DB_CONNECTION": "mysql",
-        "DB_HOST": "caboose.proxy.rlwy.net",
-        "DB_PORT": "49049",
+        "DB_HOST": "nozomi.proxy.rlwy.net",
+        "DB_PORT": "42549",
         "DB_DATABASE": "menarasumbar",
         "DB_USERNAME": "root"
     }
