@@ -37,7 +37,7 @@
 
       <footer class="border border-gray-300">
         <div class="flex justify-center font-bold">
-          <p class=" text-gray-950 m-5 flex justify-between">Create with <img src="/img/love.svg" alt="love" class="w-[25px] p-1"> by Menara Sumbar</p>
+          <p class=" text-gray-950 m-5 flex justify-between">Create with <img src="/img/love.svg" alt="love" class=" w-6 p-1"> by Menara Sumbar</p>
         </div>
       </footer>
   
