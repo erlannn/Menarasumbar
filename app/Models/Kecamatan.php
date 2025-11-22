@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Kecamatan extends Model
 {
-    protected $table = 'Kecamatan'; // tambahkan ini
+    protected $table = 'kecamatan'; // tambahkan ini
 
     protected $fillable = [
         'Kode_kecamatan',

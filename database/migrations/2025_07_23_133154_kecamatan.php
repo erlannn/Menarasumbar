@@ -13,7 +13,7 @@ return new class extends Migration
 
     public function up(): void
     {
-        Schema::create('Kecamatan', function (Blueprint $table) {
+        Schema::create('kecamatan', function (Blueprint $table) {
             $table->string('Kode_kecamatan')->primary();
             $table->string('Longitude');
             $table->string('Latitude');
