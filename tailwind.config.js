@@ -9,6 +9,7 @@ export default {
         './resources/views/**/*.blade.php',
         "./index.html",
         "./src/**/*.{vue,js,ts,jsx,tsx}",
+        "geojson/**/*",
     ],
 
     theme: {
