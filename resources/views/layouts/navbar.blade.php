@@ -1,7 +1,7 @@
 <header class="bg-[#001F3F]">
     <nav class="h-[70px] flex justify-start md:justify-between content-center place-items-center">
         <div>
-            <img class="w-[90px] h-[70px] bg-white rounded-xl ml-8" src="{{ asset('img/LogoMS.png') }}" alt="logo MenaraSumbar" srcset="">
+            <img class="w-[90px] h-[60px] bg-white rounded-xl ml-8" src="{{ asset('img/LogoMS.png') }}" alt="logo MenaraSumbar" srcset="">
         </div>
         <div>
             <ul class="flex justify-between">

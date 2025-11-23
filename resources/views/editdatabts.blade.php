@@ -21,7 +21,7 @@
                 <div class="flex justify-center mb-4">
                     <div class="mr-4">
                         <h2 class="font-semibold text-lg">Nama BTS</h2>
-                        <input type="text" name="nama_BTS"  value="{{ $bts->nama_BTS }}" class="border p-2 w-[500px] mb-2 required">
+                        <input type="text" name="nama_BTS"  value="{{ $bts->nama_BTS }}" class="border p-2 w-[500px] mb-2">
     
                         <h2 class="font-semibold text-lg">Longitude</h2>
                         <input type="text" name="Longitude"  value="{{ $bts->Longitude }}" class="border p-2 w-[500px] mb-2 required">

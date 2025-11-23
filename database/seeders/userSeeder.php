@@ -16,14 +16,14 @@ class userSeeder extends Seeder
         $superuser = User::create([
             'name' => 'Erlan',
             'username' => 'erlan',
-            'password' => bcrypt('12345678'),
+            'password' => bcrypt('00000000'),
         ]);
         $superuser->assignRole('superuser');
 
         $admin = User::create([
             'name' => 'Maulana',
             'username' => 'maulana',
-            'password' => bcrypt('maulana11'),
+            'password' => bcrypt('00000000'),
         ]);
         $admin->assignRole('admin');
     }

@@ -31,7 +31,7 @@
             </select>
 
             
-            <button type="submit" class="bg-[#014D9B] text-white px-4 py-2 rounded-lg font-semibold w-[140px] flex justify-between">Cari Data<img src="img/icon-cari.png" alt="Icon cari" class="w-[35px]"></button>
+            <button type="submit" class="bg-[#014D9B] text-white px-4 py-2 rounded-lg font-semibold w-[140px] flex justify-between">Cari Data<img src="img/icon-cari.png" alt="Icon cari" class="w-[30px] h-[25px]"></button>
 
             <a href="{{ route('kelola-bts.index') }}" class="bg-red-500 text-white h-[43px] px-4 py-2 rounded-lg font-semibold">Reset Pencarian</a>
 
@@ -92,14 +92,27 @@
                             {{ \Carbon\Carbon::parse($row->Tahun_berakhir)->format('d-m-Y') }}
                         </td>
                         <td class=" text-center w-[165px]">
-                            @if($row->sisa_waktu === 'Kadaluarsa')
-                                <span class="bg-red-500 border-gray-300 text-white px-2 py-1 rounded">
-                                    {{ $row->sisa_waktu }}
+                            @php
+                                $status = $row->sisa_waktu;
+                                $class = 'bg-gray-500'; // Default
+                                
+                                if ($status === 'Kadaluarsa') {
+                                    $class = 'bg-red-600'; // Merah untuk Kadaluarsa
+                                } elseif ($status === 'Tanggal berakhir tidak valid') {
+                                     $class = 'bg-yellow-600'; // Kuning gelap untuk error input
+                                } elseif (in_array($status, ['Berakhir Hari Ini', 'Segera Kadaluarsa'])) {
+                                    $class = 'bg-orange-500'; // Oranye untuk peringatan
+                                } elseif ($status !== null) {
+                                    $class = 'bg-green-600'; // Hijau untuk sisa waktu yang aman
+                                }
+                            @endphp
+                            
+                            @if ($status)
+                                <span class="{{ $class }} border-gray-300 text-white px-2 py-1 rounded">
+                                    {{ $status }}
                                 </span>
                             @else
-                                <span class="bg-green-500 border-gray-300 text-white px-2 py-1 rounded">
-                                    {{ $row->sisa_waktu }}
-                                </span>
+                                <span>N/A</span> 
                             @endif
                         </td>                        
                         

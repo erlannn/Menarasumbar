@@ -8,7 +8,7 @@
         <!-- Username -->
         <div>
             <x-input-label for="username" :value="__('Username')" />
-            <x-text-input id="username" class="block w-full h-[35px] bg-white text-black" type="text" placeholder="Masukkan username" name="username" :value="old('username')" required autocomplete="username"/>
+            <x-text-input id="username" class="block w-full h-[35px] bg-white text-black pl-2" type="text" placeholder="Masukkan username" name="username" :value="old('username')" required autofocus autocomplete="username"/>
             <x-input-error :messages="$errors->get('username')" class="mt-2" />
         </div>
 
@@ -16,7 +16,7 @@
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
 
-            <x-text-input id="password" class="block mt-1 w-full h-[35px] bg-white text-gray-950"
+            <x-text-input id="password" class="block mt-1 w-full h-[35px] bg-white text-gray-950 pl-2"
                             type="password"
                             placeholder="Masukkan password"
                             name="password"

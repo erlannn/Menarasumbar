@@ -22,23 +22,55 @@ class bts extends Model
 
     public function getSisaWaktuAttribute()
     {
+        // Cek ketersediaan data tanggal
         if (!$this->Tahun_registrasi || !$this->Tahun_berakhir) {
-            return null;
+            return null; // Atau pesan error lainnya
         }
 
         // Parse format MySQL (Y-m-d)
         $start = Carbon::parse($this->Tahun_registrasi);
         $end   = Carbon::parse($this->Tahun_berakhir);
+        $now   = Carbon::now(); // Dapatkan tanggal dan waktu hari ini
 
-        // Jika tanggal berakhir lebih kecil dari tanggal registrasi → salah input
+        // 1. Cek validitas input tanggal
         if ($end->lessThan($start)) {
-            return "Tanggal berakhir tidak valid";
+            return "Tanggal berakhir tidak valid"; // Tanggal berakhir lebih kecil dari tanggal registrasi
         }
 
-        // Hitung total umur simpan
-        $diff = $start->diff($end);
+        // 2. Cek status Kadaluarsa (Apakah tanggal berakhir SUDAH berlalu dari hari ini)
+        if ($end->isPast()) {
+            return "Kadaluarsa";
+        }
 
-        return $diff->format('%y Tahun %m Bulan %d Hari');
+        // 3. Hitung Sisa Waktu (Durasi dari hari ini sampai tanggal berakhir)
+        // $diff akan berupa CarbonInterval
+        $diff = $now->diff($end); 
+
+        // Format output sisa waktu yang tersisa
+        // Gunakan diffForHumans() jika ingin output lebih ringkas (misal: "3 bulan dari sekarang")
+        // Jika ingin format spesifik:
+        $years  = $diff->y;
+        $months = $diff->m;
+        $days   = $diff->d;
+
+        $parts = [];
+        if ($years > 0) {
+            $parts[] = "$years Tahun";
+        }
+        if ($months > 0) {
+            $parts[] = "$months Bulan";
+        }
+        if ($days > 0) {
+            $parts[] = "$days Hari";
+        }
+        
+        // Jika sisa waktu kurang dari 1 hari, tampilkan jam/menit jika perlu,
+        // atau cukup tampilkan "Hari Ini" atau "Akan Kadaluarsa"
+        if (empty($parts)) {
+            // Jika selisih kurang dari 1 hari, tetapi belum expired
+            return $end->isToday() ? "Berakhir Hari Ini" : "Segera Kadaluarsa";
+        }
+
+        return implode(' ', $parts);
     }
-
 }

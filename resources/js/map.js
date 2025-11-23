@@ -280,7 +280,7 @@ window.map = function () {
 
             this.userLocationFeature.setStyle(new Style({
                 image: new CircleStyle({
-                    radius: 6,
+                    radius: 7,
                     fill: new Fill({ color: '#0000FF' }),
                     stroke: new Stroke({ color: '#FFFFFF', width: 2 })
                 })

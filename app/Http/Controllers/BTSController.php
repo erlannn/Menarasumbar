@@ -9,6 +9,7 @@ use App\Models\perangkatjaringan;
 use App\Models\kecamatan;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Validation\Rule;
 
 class BTSController extends Controller
 {
@@ -160,10 +161,16 @@ class BTSController extends Controller
         return view('editdatabts', compact('bts','operator','perangkat','kecamatan'));
     }
 
+    //'nama_BTS' => 'required|unique:bts,nama_BTS',
     public function update(Request $request, $id)
     {
+        $bts = bts::findOrFail($id);
+
         $request->validate([
-            'nama_BTS' => 'required|unique:bts,nama_BTS',
+            'nama_BTS' => [
+            'required',
+            Rule::unique('bts', 'nama_BTS')->ignore($id),
+        ],
             'Longitude' => 'required',
             'Latitude' => 'required',
             'Tahun_registrasi' => 'required|date',
@@ -192,7 +199,6 @@ class BTSController extends Controller
             'Kode_kecamatan' => 'Kecamatan',
         ]);
 
-        $bts = bts::findOrFail($id);
         $bts->update($request->all());
 
         return redirect()->route('kelola-bts.index')->with('success','Data BTS berhasil diperbarui!');
