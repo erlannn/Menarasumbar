@@ -19,7 +19,7 @@
         "APP_ENV": "production",
         "APP_DEBUG": "false",
         "APP_URL": "https://menarasumbar.vercel.app",
-        "APP_KEY": "base64:5HPkUddu0pKJ0vIEW9jzuL235XiC4CAyQWjHOs9whGA=",
+        "APP_KEY": "base64:cmTZItjyJ5b3cy6HiICZJs9I9PiiZIIPg3ZZ1gWD8ho=",
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
         "APP_PACKAGES_CACHE": "/tmp/packages.php",
@@ -30,8 +30,8 @@
         "LOG_CHANNEL": "stack",
         "SESSION_DRIVER": "database",
         "DB_CONNECTION": "mysql",
-        "DB_HOST": "nozomi.proxy.rlwy.net",
-        "DB_PORT": "42549",
+        "DB_HOST": "switchyard.proxy.rlwy.net",
+        "DB_PORT": "43746",
         "DB_DATABASE": "menarasumbar",
         "DB_USERNAME": "root"
     }

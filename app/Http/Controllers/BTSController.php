@@ -161,7 +161,6 @@ class BTSController extends Controller
         return view('editdatabts', compact('bts','operator','perangkat','kecamatan'));
     }
 
-    //'nama_BTS' => 'required|unique:bts,nama_BTS',
     public function update(Request $request, $id)
     {
         $bts = bts::findOrFail($id);
