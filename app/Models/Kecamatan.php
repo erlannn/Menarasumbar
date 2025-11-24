@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Kecamatan extends Model
 {
-    protected $table = 'kecamatan'; // tambahkan ini
+    protected $table = 'kecamatan'; 
 
     protected $fillable = [
         'Kode_kecamatan',
@@ -15,5 +15,5 @@ class Kecamatan extends Model
         'Nama_kecamatan'
     ];
 
-    public $timestamps = false; // karena kamu tidak pakai created_at / updated_at
+    public $timestamps = false; 
 }

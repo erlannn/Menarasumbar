@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PerangkatJaringan extends Model
 {
-
-    protected $table = 'perangkatjaringan'; // tambahkan ini
+    protected $table = 'perangkatjaringan'; 
     protected $fillable = [
         'Kode_perangkat_jaringan',
         'Perangkat',
@@ -15,5 +14,5 @@ class PerangkatJaringan extends Model
         'Jangkauan_sinyal',
     ];
 
-    public $timestamps = false; // karena kamu tidak pakai created_at / updated_at
+    public $timestamps = false; 
 }
