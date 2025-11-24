@@ -107,9 +107,9 @@ class BTSController extends Controller
 
     public function create()
     {
-        $operator = operator::all();
-        $perangkat = perangkatjaringan::all();
-        $kecamatan = kecamatan::all();
+        $operator = Operator::all();
+        $perangkat = PerangkatJaringan::all();
+        $kecamatan = Kecamatan::all();
 
         return view('tambahdatabts', compact('operator','perangkat','kecamatan'));
     }
