@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\bts;
-use App\Models\operator;
-use App\Models\perangkatjaringan;
-use App\Models\kecamatan;
+use App\Models\Operator;
+use App\Models\PerangkatJaringan;
+use App\Models\Kecamatan;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Validation\Rule;
@@ -155,9 +155,9 @@ class BTSController extends Controller
         // Uji Baris 1: Paling sensitif karena menggunakan $id
         try {
             $bts = Bts::findOrFail($id); 
-            $operator = operator::get();
-            $perangkat = perangkatjaringan::get();
-            $kecamatan = kecamatan::get();
+            $operator = Operator::get();
+            $perangkat = PerangkatJaringan::get();
+            $kecamatan = Kecamatan::get();
             return 'operator, perangkat dan kecamatan Ditemukan!'; // Jika berhasil, seharusnya muncul ini
         } catch (\Throwable $th) {
             return 'ERROR di BTS: ' . $th->getMessage(); // Jika gagal, ini akan menampilkan error spesifik
