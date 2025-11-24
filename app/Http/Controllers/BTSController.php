@@ -153,15 +153,17 @@ class BTSController extends Controller
     public function edit($id)
     {
         // Uji Baris 1: Paling sensitif karena menggunakan $id
-        try {
-            $bts = Bts::findOrFail($id); 
-            $operator = Operator::get();
-            $perangkat = PerangkatJaringan::get();
-            $kecamatan = Kecamatan::get();
-            return 'operator, perangkat dan kecamatan Ditemukan!'; // Jika berhasil, seharusnya muncul ini
-        } catch (\Throwable $th) {
-            return 'ERROR di BTS: ' . $th->getMessage(); // Jika gagal, ini akan menampilkan error spesifik
-        }
+        // try {
+            
+        //     return 'operator, perangkat dan kecamatan Ditemukan!'; // Jika berhasil, seharusnya muncul ini
+        // } catch (\Throwable $th) {
+        //     return 'ERROR di BTS: ' . $th->getMessage(); // Jika gagal, ini akan menampilkan error spesifik
+        // }
+
+        $bts = Bts::findOrFail($id); 
+        $operator = Operator::get();
+        $perangkat = PerangkatJaringan::get();
+        $kecamatan = Kecamatan::get();
 
         return view('editdatabts', compact('bts','operator','perangkat','kecamatan'));
     }
