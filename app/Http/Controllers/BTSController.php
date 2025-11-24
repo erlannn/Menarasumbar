@@ -152,13 +152,11 @@ class BTSController extends Controller
 
     public function edit($id)
     {
-        // UJI COBA INI:
-        return 'Halaman Edit Ditemukan!';
+        $bts = bts::findOrFail($id);
 
-        // $bts = bts::findOrFail($id);
-        // $operator = operator::get();
-        // $perangkat = perangkatjaringan::get();
-        // $kecamatan = kecamatan::get();
+        $operator = operator::get();
+        $perangkat = perangkatjaringan::get();
+        $kecamatan = kecamatan::get();
 
         return view('editdatabts', compact('bts','operator','perangkat','kecamatan'));
     }
