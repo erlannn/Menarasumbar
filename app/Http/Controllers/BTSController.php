@@ -155,9 +155,9 @@ class BTSController extends Controller
         // Uji Baris 1: Paling sensitif karena menggunakan $id
         try {
             $bts = Bts::findOrFail($id); 
-            $operator = Operator::get();
-            $perangkat = PerangkatJaringan::get();
-            $kecamatan = Kecamatan::get();
+            $operator = operator::get();
+            $perangkat = perangkatjaringan::get();
+            $kecamatan = kecamatan::get();
             return 'operator, perangkat dan kecamatan Ditemukan!'; // Jika berhasil, seharusnya muncul ini
         } catch (\Throwable $th) {
             return 'ERROR di BTS: ' . $th->getMessage(); // Jika gagal, ini akan menampilkan error spesifik
