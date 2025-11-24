@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\bts;
 use Illuminate\Database\Seeder;
 
-
 class btsSeeder extends Seeder
 {
     /**
@@ -13,6 +12,6 @@ class btsSeeder extends Seeder
      */
     public function run(): void
     {
-    
+        //
     }
 }

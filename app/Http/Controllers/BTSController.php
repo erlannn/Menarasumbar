@@ -105,7 +105,6 @@ class BTSController extends Controller
         ));
     }
 
-
     public function create()
     {
         $operator = operator::all();
@@ -153,10 +152,13 @@ class BTSController extends Controller
 
     public function edit($id)
     {
-        $bts = bts::findOrFail($id);
-        $operator = operator::all();
-        $perangkat = perangkatjaringan::all();
-        $kecamatan = kecamatan::all();
+        // UJI COBA INI:
+        return 'Halaman Edit Ditemukan!';
+
+        // $bts = bts::findOrFail($id);
+        // $operator = operator::get();
+        // $perangkat = perangkatjaringan::get();
+        // $kecamatan = kecamatan::get();
 
         return view('editdatabts', compact('bts','operator','perangkat','kecamatan'));
     }
@@ -170,8 +172,8 @@ class BTSController extends Controller
             'required',
             Rule::unique('bts', 'nama_BTS')->ignore($id),
         ],
-            'Longitude' => 'required',
-            'Latitude' => 'required',
+            'Longitude' => 'required|numeric',
+            'Latitude' => 'required|numeric',
             'Tahun_registrasi' => 'required|date',
             'Tahun_berakhir' => 'required|date',
             'alamat' => 'required',
@@ -198,7 +200,17 @@ class BTSController extends Controller
             'Kode_kecamatan' => 'Kecamatan',
         ]);
 
-        $bts->update($request->all());
+        $bts->update($request->only([
+            'nama_BTS',
+            'Longitude',
+            'Latitude',
+            'Tahun_registrasi',
+            'Tahun_berakhir',
+            'alamat',
+            'Kode_operator',
+            'Kode_perangkat_jaringan',
+            'Kode_kecamatan',
+        ]));
 
         return redirect()->route('kelola-bts.index')->with('success','Data BTS berhasil diperbarui!');
     }
