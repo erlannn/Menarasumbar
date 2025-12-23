@@ -86,7 +86,6 @@ window.map = function () {
         
                     this.map.addLayer(geojsonLayer);
         
-                    // 🔥 Tambahkan callback ini
                     source.on('change', () => {
                         if (source.getState() === 'ready') {
                             this.map.getView().animate({
@@ -280,7 +279,7 @@ window.map = function () {
 
             this.userLocationFeature.setStyle(new Style({
                 image: new CircleStyle({
-                    radius: 7,
+                    radius: 8,
                     fill: new Fill({ color: '#0000FF' }),
                     stroke: new Stroke({ color: '#FFFFFF', width: 2 })
                 })

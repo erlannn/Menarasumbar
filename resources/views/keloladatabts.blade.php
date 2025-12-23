@@ -32,7 +32,7 @@
 
             <button type="submit" class="bg-[#014D9B] text-white px-4 py-2 rounded-lg font-semibold w-[140px] flex justify-between">Cari Data<img src="img/icon-cari.png" alt="Icon cari" class="w-[30px] h-[25px]"></button>
 
-            <a href="{{ route('kelola-bts.index') }}" class="bg-red-500 text-white h-[43px] px-4 py-2 rounded-lg font-semibold">Reset Pencarian</a>
+            <a href="{{ route('kelola-bts.index') }}" class="bg-red-600 text-white h-[43px] px-4 py-2 rounded-lg font-semibold">Reset Pencarian</a>
 
             @if (Route::has('login'))
                 @auth
@@ -132,7 +132,7 @@
         </table>
 
         {{-- ✅ Pagination links tetap jalan --}}
-        <div class="mt-4">
+        <div class="mt-4 ml-2">
             {{ $bts->appends(request()->query())->links() }}
         </div>
     </div>

@@ -16,6 +16,7 @@
     "buildCommand": "npm install && npm run build",
     "outputDirectory": "public",
     "env": {
+        "APP_NAME":"MenaraSumbar",
         "APP_ENV": "production",
         "APP_DEBUG": "false",
         "APP_URL": "https://menarasumbar.vercel.app",
@@ -30,9 +31,9 @@
         "LOG_CHANNEL": "stack",
         "SESSION_DRIVER": "database",
         "DB_CONNECTION": "mysql",
-        "DB_HOST": "nozomi.proxy.rlwy.net",
-        "DB_PORT": "33697",
-        "DB_DATABASE": "menarasumbar",
-        "DB_USERNAME": "root"
+        "DB_HOST": "u178wr.h.filess.io",
+        "DB_PORT": "61002",
+        "DB_DATABASE": "menarasumbar_sawnearsky",
+        "DB_USERNAME": "menarasumbar_sawnearsky"
     }
 }
