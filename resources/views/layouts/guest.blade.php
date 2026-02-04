@@ -16,9 +16,9 @@
     </head>
     <body class="font-sans antialiased bg-[#001F3F]">
 
-        {{-- <div class="static flex justify-start">
+        <div class="static flex justify-start">
             <p class=" text-white bg-blue-800 w-[280px] h-[65px] absolute mt-96 border-blue-950 border-4 pt-1 rounded-md">Waktu yang dibutuhkan : {{ round((microtime(true) - LARAVEL_START), 3) }} detik.</p>
-        </div> --}}
+        </div>
 
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
 

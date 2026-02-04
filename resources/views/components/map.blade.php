@@ -17,7 +17,7 @@
         x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
         x-transition:leave="transition-opacity duration-300" x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
-        class="absolute right-0 top-28 left-96 bottom-2 z-10 w-[300px] h-[500px] rounded-md border border-slate-300 bg-white bg-opacity-50 shadow-sm text-black">
+        class="absolute right-0 top-28 left-96 bottom-2 z-10 w-[400px] h-[600px] rounded-md border border-slate-300 bg-white bg-opacity-50 shadow-sm text-black">
         <div class="absolute inset-1 rounded-md bg-white bg-opacity-75 p-2">
         Openlayers							
             <div class="flex items-start justify-between">
