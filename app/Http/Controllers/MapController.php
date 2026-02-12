@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Kecamatan;
-use App\Models\bts;
+use App\Models\BTS;
 
 class MapController extends Controller
 {
@@ -21,7 +22,7 @@ class MapController extends Controller
         // Ambil data kecamatan aktif
         $kecamatan = Kecamatan::where('Kode_kecamatan', $kode_kecamatan)->firstOrFail();
 
-        // Jika kecamatan bernama Padang → ambil semua BTS
+        // Jika kecamatan bernama Padang → ambil semua bts
         if (strtolower($kecamatan->Nama_kecamatan) === 'padang') {
             $btsList = BTS::join('perangkatjaringan', 'bts.Kode_perangkat_jaringan', '=', 'perangkatjaringan.Kode_perangkat_jaringan')
                 ->select(
@@ -32,7 +33,8 @@ class MapController extends Controller
                     'bts.Kode_operator',
                     'bts.Kode_perangkat_jaringan',
                     'bts.Kode_kecamatan',
-                    'perangkatjaringan.jenis_jaringan'
+                    'perangkatjaringan.jenis_jaringan',
+                    'perangkatjaringan.Jangkauan_sinyal'
                 )
                 ->get();
         } else {
@@ -47,7 +49,8 @@ class MapController extends Controller
                     'bts.Kode_operator',
                     'bts.Kode_perangkat_jaringan',
                     'bts.Kode_kecamatan',
-                    'perangkatjaringan.jenis_jaringan'
+                    'perangkatjaringan.jenis_jaringan',
+                    'perangkatjaringan.Jangkauan_sinyal'
                 )
                 ->get();
         }

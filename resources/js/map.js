@@ -4,8 +4,8 @@ import 'ol/ol.css';
 import { Map, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
-import { fromLonLat } from 'ol/proj';
 
+import { fromLonLat } from 'ol/proj';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import Circle from 'ol/geom/Circle';
@@ -15,6 +15,26 @@ import VectorLayer from 'ol/layer/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import { getDistance } from 'ol/sphere';
 import { toLonLat } from 'ol/proj';
+import Polygon from 'ol/geom/Polygon';
+import { area as turfArea, union as turfUnion, intersect as turfIntersect, difference as turfDifference } from '@turf/turf';
+
+// Helper function to convert Circle geometry to Polygon
+function circleToPolygon(circleGeom, numPoints = 64) {
+    const center = circleGeom.getCenter();
+    const radius = circleGeom.getRadius();
+    const coords = [];
+    
+    for (let i = 0; i < numPoints; i++) {
+        const angle = (i / numPoints) * 2 * Math.PI;
+        const x = center[0] + radius * Math.cos(angle);
+        const y = center[1] + radius * Math.sin(angle);
+        coords.push([x, y]);
+    }
+    // Close the polygon
+    coords.push(coords[0]);
+    
+    return new Polygon([coords]);
+}
 
 window.map = function () {
     return {
@@ -47,6 +67,8 @@ window.map = function () {
             });
 
             window.mapObj = this;
+            this.coverageSources = null;
+            this.kecamatanSource = null;
 
             this.addBoundaryLayer();
             this.addBTSLayers();
@@ -61,13 +83,301 @@ window.map = function () {
                     zoom: 13,
                     duration: 800
                 });
-            }, 400);
+                // Calculate coverage after layers are ready
+                console.log('>>> init timeout: calling calculateAndDisplayCoverage');
+                this.calculateAndDisplayCoverage();
+            }, 1000);
         },
 
+        calculateAndDisplayCoverage() {
+            try {
+                console.log('=== Coverage Calculation Start ===');
+                
+                if (!this.kecamatanSource || !this.coverageSources) {
+                    console.warn('kecamatanSource or coverageSources not ready');
+                    return;
+                }
+
+                const kecFeatures = this.kecamatanSource.getFeatures();
+                console.log('Kecamatan features:', kecFeatures.length);
+                if (!kecFeatures || kecFeatures.length === 0) {
+                    console.warn('No kecamatan boundary features found');
+                    return;
+                }
+
+                const geojsonFormat = new GeoJSON();
+                const kecFeat = kecFeatures[0];
+                const kecGeo = geojsonFormat.writeFeatureObject(kecFeat, { featureProjection: 'EPSG:3857', dataProjection: 'EPSG:4326' });
+                const kecArea = turfArea(kecGeo);
+                console.log('Kecamatan area (m²):', kecArea, '| km²:', (kecArea/1000000).toFixed(3));
+
+                // Initialize layers if not exist
+                if (!this.coveredLayers) this.coveredLayers = {};
+                if (!this.blankLayers) this.blankLayers = {};
+
+                const operatorStyles = {
+                    OP1: { label: 'Telkomsel', coveredColor: 'rgba(255, 0, 0, 0.5)', blankColor: 'rgba(255, 255, 255, 0.95)' },
+                    OP2: { label: 'Indosat', coveredColor: 'rgba(255, 255, 0, 1)', blankColor: 'rgba(255, 255, 255, 0.95)' }
+                };
+
+                const operatorData = {};
+
+                // Calculate per operator
+                Object.keys(this.coverageSources).forEach(opKey => {
+                    const src = this.coverageSources[opKey];
+                    const features = src.getFeatures();
+                    console.log(`Operator ${opKey}: ${features.length} BTS`);
+                    
+                    const opConfig = operatorStyles[opKey] || { label: 'Lainnya', coveredColor: 'rgba(0, 123, 255, 0.4)', blankColor: 'rgba(255, 255, 255, 0.95)' };
+                    
+                    // Collect coverage polygons for this operator
+                    const coveragePolys = [];
+                    features.forEach((f, idx) => {
+                        try {
+                            let geom = f.getGeometry();
+                            let polyGeom = geom;
+                            
+                            // Convert Circle to Polygon
+                            if (geom && typeof geom.getType === 'function' && geom.getType() === 'Circle') {
+                                polyGeom = circleToPolygon(geom, 64);
+                            }
+
+                            const tmpFeat = new Feature({ geometry: polyGeom });
+                            const polyGeo = geojsonFormat.writeFeatureObject(tmpFeat, { 
+                                featureProjection: 'EPSG:3857', 
+                                dataProjection: 'EPSG:4326' 
+                            });
+                            
+                            coveragePolys.push(polyGeo);
+                        } catch (e) {
+                            console.error(`Error converting BTS ${idx} geometry for ${opKey}:`, e);
+                        }
+                    });
+
+                    // Union coverage polygons for this operator
+                    let mergedOp = null;
+                    if (coveragePolys.length > 0) {
+                        try {
+                            mergedOp = coveragePolys.reduce((acc, poly, idx) => {
+                                if (!acc) return poly;
+                                try {
+                                    const result = turfUnion(acc, poly);
+                                    return result || acc;
+                                } catch (e) {
+                                    console.warn(`Union step ${idx} for ${opKey} failed:`, e.message);
+                                    return acc;
+                                }
+                            }, null);
+                        } catch (e) {
+                            console.error(`Union reduce failed for ${opKey}:`, e);
+                            mergedOp = null;
+                        }
+                    }
+
+                    // Intersect with kecamatan
+                    let coveredArea = 0;
+                    if (mergedOp) {
+                        try {
+                            const intersection = turfIntersect(mergedOp, kecGeo);
+                            if (intersection) {
+                                coveredArea = turfArea(intersection);
+                            }
+                        } catch (e) {
+                            console.error(`Intersection error for ${opKey}:`, e);
+                            coveredArea = 0;
+                        }
+                    }
+
+                    const blankArea = Math.max(0, kecArea - coveredArea);
+                    const pctBlank = kecArea > 0 ? (blankArea / kecArea) * 100 : 0;
+                    const pctCovered = kecArea > 0 ? (coveredArea / kecArea) * 100 : 0;
+
+                    console.log(`${opConfig.label} - Covered:`, coveredArea, '|', pctCovered.toFixed(2), '% | Blank:', blankArea, '|', pctBlank.toFixed(2), '%');
+
+                    operatorData[opKey] = {
+                        coveredArea: coveredArea,
+                        blankArea: blankArea,
+                        pctCovered: pctCovered,
+                        pctBlank: pctBlank
+                    };
+
+                    // Create/update covered layer
+                    let coveredGeo = null;
+                    let blankGeo = null;
+                    if (mergedOp) {
+                        const intersection = turfIntersect(mergedOp, kecGeo);
+                        if (intersection) {
+                            coveredGeo = intersection;
+                            blankGeo = turfDifference(kecGeo, intersection) || null;
+                        } else {
+                            coveredGeo = null;
+                            blankGeo = kecGeo;
+                        }
+                    } else {
+                        coveredGeo = null;
+                        blankGeo = kecGeo;
+                    }
+
+                    const geojsonReader = new GeoJSON();
+
+                    // Covered layer
+                    if (this.coveredLayers[opKey] && this.coveredLayers[opKey].getSource()) {
+                        this.coveredLayers[opKey].getSource().clear();
+                        if (coveredGeo) {
+                            const feats = geojsonReader.readFeatures(coveredGeo, { featureProjection: 'EPSG:3857', dataProjection: 'EPSG:4326' });
+                            this.coveredLayers[opKey].getSource().addFeatures(feats);
+                        }
+                    } else {
+                        const coveredSource = new VectorSource();
+                        if (coveredGeo) {
+                            const feats = geojsonReader.readFeatures(coveredGeo, { featureProjection: 'EPSG:3857', dataProjection: 'EPSG:4326' });
+                            coveredSource.addFeatures(feats);
+                        }
+                        this.coveredLayers[opKey] = new VectorLayer({
+                            source: coveredSource,
+                            style: new Style({
+                                fill: new Fill({ color: opConfig.coveredColor }),
+                                stroke: new Stroke({ color: 'rgba(0, 0, 0, 0.5)', width: 1 })
+                            }),
+                            zIndex: 7,
+                            visible: true,
+                            label: `Area Tercover ${opConfig.label}`
+                        });
+                        this.map.addLayer(this.coveredLayers[opKey]);
+                    }
+
+                    // Blank layer
+                    if (this.blankLayers[opKey] && this.blankLayers[opKey].getSource()) {
+                        this.blankLayers[opKey].getSource().clear();
+                        if (blankGeo) {
+                            const feats = geojsonReader.readFeatures(blankGeo, { featureProjection: 'EPSG:3857', dataProjection: 'EPSG:4326' });
+                            this.blankLayers[opKey].getSource().addFeatures(feats);
+                        }
+                    } else {
+                        const blankSource = new VectorSource();
+                        if (blankGeo) {
+                            const feats = geojsonReader.readFeatures(blankGeo, { featureProjection: 'EPSG:3857', dataProjection: 'EPSG:4326' });
+                            blankSource.addFeatures(feats);
+                        }
+                        this.blankLayers[opKey] = new VectorLayer({
+                            source: blankSource,
+                            style: new Style({
+                                fill: new Fill({ color: opConfig.blankColor }),
+                                stroke: new Stroke({ color: 'rgba(150, 150, 150, 0.6)', width: 1 })
+                            }),
+                            zIndex: 6,
+                            visible: true,
+                            label: `Blank Spot ${opConfig.label}`
+                        });
+                        this.map.addLayer(this.blankLayers[opKey]);
+                    }
+                });
+
+                // Build statsHtml
+                let statsHtml = `<strong>Area Kecamatan:</strong> ${ (kecArea/1000000).toFixed(3) } km²<br>`;
+                if (operatorData.OP1) {
+                    statsHtml += `<strong>Blank Spot Telkomsel:</strong> ${ (operatorData.OP1.coveredArea/1000000).toFixed(3) } km² (${operatorData.OP1.pctCovered.toFixed(2)}%)<br>`;
+                    statsHtml += `<strong>Non-Blank Spot Telkomsel:</strong> ${ (operatorData.OP1.blankArea/1000000).toFixed(3) } km² (${operatorData.OP1.pctBlank.toFixed(2)}%)<br>`;
+                }
+                if (operatorData.OP2) {
+                    statsHtml += `<br><strong>Blank Spot Indosat:</strong> ${ (operatorData.OP2.coveredArea/1000000).toFixed(3) } km² (${operatorData.OP2.pctCovered.toFixed(2)}%)<br>`;
+                    statsHtml += `<strong>Non-Blank Spot Indosat:</strong> ${ (operatorData.OP2.blankArea/1000000).toFixed(3) } km² (${operatorData.OP2.pctBlank.toFixed(2)}%)<br>`;
+                }
+
+                // Update external placeholder (e.g., left panel)
+                const ext = document.getElementById('coverage-summary');
+                if (ext) {
+                    ext.innerHTML = statsHtml;
+                }
+                
+                console.log('Display updated');
+                
+                console.log('=== Coverage Calculation End ===');
+            } catch (e) {
+                console.error('calculateAndDisplayCoverage error:', e);
+            }
+        },
+
+        _createLayerToggleUI() {
+            try {
+                if (!this.$refs || !this.$refs.map) return;
+
+                const container = this.$refs.map;
+                const ctrl = document.createElement('div');
+                ctrl.style.position = 'absolute';
+                ctrl.style.top = '10px';
+                ctrl.style.right = '10px';
+                ctrl.style.background = 'rgba(255,255,255,0.9)';
+                ctrl.style.padding = '8px';
+                ctrl.style.borderRadius = '6px';
+                ctrl.style.zIndex = 2000;
+                ctrl.style.maxHeight = '80vh';
+                ctrl.style.overflowY = 'auto';
+
+                const operatorStyles = {
+                    OP1: { label: 'Telkomsel' },
+                    OP2: { label: 'Indosat' }
+                };
+
+                Object.keys(operatorStyles).forEach(opKey => {
+                    const opConfig = operatorStyles[opKey];
+                    
+                    // Blank spot checkbox
+                    const cbBlank = document.createElement('input');
+                    cbBlank.type = 'checkbox';
+                    cbBlank.id = `cb-blank-${opKey}`;
+                    cbBlank.checked = true;
+                    cbBlank.style.marginRight = '6px';
+                    const lblBlank = document.createElement('label');
+                    lblBlank.htmlFor = `cb-blank-${opKey}`;
+                    lblBlank.innerText = `Blank Spot ${opConfig.label}`;
+                    lblBlank.style.display = 'block';
+                    lblBlank.style.marginBottom = '4px';
+
+                    // Covered area checkbox
+                    const cbCovered = document.createElement('input');
+                    cbCovered.type = 'checkbox';
+                    cbCovered.id = `cb-covered-${opKey}`;
+                    cbCovered.checked = true;
+                    cbCovered.style.marginRight = '6px';
+                    const lblCovered = document.createElement('label');
+                    lblCovered.htmlFor = `cb-covered-${opKey}`;
+                    lblCovered.innerText = `Area Tercover ${opConfig.label}`;
+                    lblCovered.style.display = 'block';
+                    lblCovered.style.marginBottom = '8px';
+
+                    ctrl.appendChild(cbBlank);
+                    ctrl.appendChild(lblBlank);
+                    ctrl.appendChild(cbCovered);
+                    ctrl.appendChild(lblCovered);
+
+                    cbBlank.addEventListener('change', (e) => {
+                        if (this.blankLayers && this.blankLayers[opKey]) {
+                            this.blankLayers[opKey].setVisible(e.target.checked);
+                        }
+                    });
+
+                    cbCovered.addEventListener('change', (e) => {
+                        if (this.coveredLayers && this.coveredLayers[opKey]) {
+                            this.coveredLayers[opKey].setVisible(e.target.checked);
+                        }
+                    });
+                });
+
+                container.appendChild(ctrl);
+            } catch (e) {
+                console.warn('Could not create layer toggle UI:', e);
+            }
+        },
         addBoundaryLayer() {
+            console.log('>>> addBoundaryLayer called, fetching:', window.kecamatanGeoJSON);
             fetch(window.kecamatanGeoJSON)
-                .then(response => response.json())
+                .then(response => {
+                    console.log('>>> GeoJSON fetch response:', response.status);
+                    return response.json();
+                })
                 .then(geojsonData => {
+                    console.log('>>> GeoJSON data loaded, features:', geojsonData.features ? geojsonData.features.length : 0);
                     const source = new VectorSource({
                         features: new GeoJSON().readFeatures(geojsonData, {
                             featureProjection: 'EPSG:3857'
@@ -77,7 +387,7 @@ window.map = function () {
                     const geojsonLayer = new VectorLayer({
                         source: source,
                         style: new Style({
-                            stroke: new Stroke({ color: 'yellow', width: 2 }),
+                            stroke: new Stroke({ color: 'yellow', width: 3 }),
                             fill: new Fill({ color: 'rgba(255, 0, 0, 0)' })
                         }),
                         zIndex: 1,
@@ -85,23 +395,14 @@ window.map = function () {
                     });
         
                     this.map.addLayer(geojsonLayer);
-        
-                    source.on('change', () => {
-                        if (source.getState() === 'ready') {
-                            this.map.getView().animate({
-                                center: fromLonLat([
-                                    Number(window.kecamatanCenter.lon),
-                                    Number(window.kecamatanCenter.lat)
-                                ]),
-                                zoom: 13,
-                                duration: 800
-                            });
-                        }
-                    });
-                });
+                    this.kecamatanSource = source;
+                    console.log('>>> kecamatanSource set, feature count:', source.getFeatures().length);
+                })
+                .catch(err => console.error('>>> GeoJSON fetch error:', err));
         },        
 
         addBTSLayers() {
+            console.log('>>> addBTSLayers called');
             const operatorStyles = {
                 OP1: {
                     src: '/img/Telkomsel.png',
@@ -130,6 +431,7 @@ window.map = function () {
         
             window.btsData.forEach(bts => {
                 const operator = bts.Kode_operator;
+                console.log('>>> BTS:', bts.nama_BTS, '| jenis_jaringan:', bts.jenis_jaringan, '| operator:', operator);
                 const styleConfig = operatorStyles[operator] || {
                     src: '/img/default.png',
                     scale: 0.1,
@@ -139,9 +441,16 @@ window.map = function () {
                 };
         
                 const coord = fromLonLat([parseFloat(bts.Longitude), parseFloat(bts.Latitude)]);
-                const jangkauanKm = bts.jenis_jaringan === '3G' ? 5 :
-                                    bts.jenis_jaringan === '4G' ? 3 :
-                                    bts.jenis_jaringan === '5G' ? 2 : null;
+                
+                // Baca jangkauan dari tabel perangkatjaringan (Jangkauan_sinyal)
+                let jangkauanKm = bts.Jangkauan_sinyal ? parseFloat(bts.Jangkauan_sinyal) : null;
+                if (!jangkauanKm) {
+                    // Fallback: hitung dari jenis_jaringan jika radius tidak ada
+                    jangkauanKm = bts.jenis_jaringan === '3G' ? 4 :
+                                  bts.jenis_jaringan === '4G' ? 3 :
+                                  bts.jenis_jaringan === '5G' ? 2 : 3;
+                }
+                console.log('>>> BTS:', bts.nama_BTS, '| Jangkauan:', jangkauanKm, 'km');
         
                 // Marker BTS
                 const marker = new Feature({
@@ -178,6 +487,7 @@ window.map = function () {
                     }));
         
                     coverageSources[operator].addFeature(coverage);
+                    console.log('>>> Added coverage feature for', bts.nama_BTS, 'to', operator);
                 }
             });
         
@@ -194,6 +504,13 @@ window.map = function () {
                     label: `Jangkauan ${operatorStyles[op].label}`,
                     zIndex: 5
                 }));
+            });
+
+            // keep reference to coverage sources for area calculations
+            this.coverageSources = coverageSources;
+            console.log('>>> coverageSources set, operators:', Object.keys(coverageSources));
+            Object.keys(coverageSources).forEach(key => {
+                console.log('>>> Operator', key, '- coverage features count:', coverageSources[key].getFeatures().length);
             });
         
             // Pop-up klik

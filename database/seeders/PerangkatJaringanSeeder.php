@@ -18,7 +18,7 @@ class PerangkatJaringanSeeder extends Seeder
             [
                 'Perangkat' => 'Kathrein 742215',
                 'Jenis_jaringan' => '3G',
-                'Jangkauan_sinyal' => 4,
+                'Jangkauan_sinyal' => 0.6,
             ]
         );
         
@@ -28,7 +28,7 @@ class PerangkatJaringanSeeder extends Seeder
             [
             'Perangkat' => 'Nokia AirScale Active Antenna',
             'Jenis_jaringan' => '4G',
-            'Jangkauan_sinyal' => '3',
+            'Jangkauan_sinyal' => '0.5',
         ]);
 
         PerangkatJaringan::updateOrInsert(
@@ -36,7 +36,7 @@ class PerangkatJaringanSeeder extends Seeder
             [
             'Perangkat' => 'Huawei AAU5613',
             'Jenis_jaringan' => '5G',
-            'Jangkauan_sinyal' => '2',
+            'Jangkauan_sinyal' => '0.4',
         ]);
     }
 }

@@ -6,13 +6,19 @@
         <div>
             <ul class="flex justify-between">
                 <li>
-                    <a href="{{ url('/beranda') }}" class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#ffffff] hover:text-[#000000] hover:bg-[#fafafa] active:hover:bg-[#fafafa] rounded-xl font-semibold text-base leading-normal">Beranda</a>
+                    <x-nav-link :href="route('beranda')" :active="request()->routeIs('beranda')" class="mr-1">
+                        {{ __('Beranda') }}
+                    </x-nav-link>
                 </li>
                 <li>
-                    <a href="{{ url('/petaAwal') }}" class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#ffffff] hover:text-[#000000] hover:bg-[#fafafa] rounded-xl font-semibold text-base leading-normall">Peta BTS</a>
+                    <x-nav-link :href="route('petaAwal')" :active="request()->routeIs('petaAwal')" class="mr-1">
+                        {{ __('Peta BTS') }}
+                    </x-nav-link>
                 </li>
                 <li>
-                    <a href="{{ url('/databts') }}" class="inline-block px-5 py-1.5 mr-2 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#ffffff] hover:text-[#000000] hover:bg-[#fafafa] rounded-xl font-semibold text-base leading-normal">Data BTS</a>
+                    <x-nav-link :href="route('databts')" :active="request()->routeIs('databts')" class="mr-1">
+                        {{ __('Data BTS') }}
+                    </x-nav-link>
                 </li>
                 <li>
                     @if (Route::has('login'))

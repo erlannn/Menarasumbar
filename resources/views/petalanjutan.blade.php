@@ -1,8 +1,8 @@
 <x-main-layout>
     <div class="flex justify-between">
-        <div class=" rounded-md mt-7 ml-3  w-[300px] h-[530px] bg-[#001F3F]">
+        <div class=" rounded-md mt-7 ml-3 w-[300px] h-[530px] bg-[#001F3F]">
             @if($kecamatan->Nama_kecamatan === 'padang')
-                <h1 class=" font-semibold text-lg mt-5 ml-5" > Nama wilayah:
+                <h1 class=" font-semibold text-lg ml-5" > Nama wilayah:
                     {{ $kecamatan->Nama_kecamatan }}
                 </h1>
             @else
@@ -11,15 +11,22 @@
                 </h1>
             @endif
 
-            <p class="mt-1 ml-5 mr-4 text-justify">
+            <p class="ml-5 mr-4 text-justify">
                 @if($kecamatan->Nama_kecamatan === 'Padang')
 
                 @else
-                Kode kecamatan: {{ $kecamatan->Kode_kecamatan }} <br><br>
+                Kode kecamatan: {{ $kecamatan->Kode_kecamatan }}<br>
                 @endif
                 @foreach ($operatorCountsReadable as $operator => $count)
                     {{ $operator }}: {{ $count }} BTS <br>
                 @endforeach
+
+                <!-- Coverage summary (will be filled by map.js) -->
+                <div id="coverage-summary" class="text-white mt-4 ml-5 mr-4 text-sm">
+                    <strong>Area Kecamatan:</strong> - km²<br>
+                    <strong>Non-Blank Spot:</strong> - km² (-%)<br>
+                    <strong>Blank Spot:</strong> - km² (-%)
+                </div>
 
                 <p class="text-white mt-3 ml-5 mr-4 text-justify">Klik tombol untuk mengetahui lokasi saat ini!</p>
                 <button onclick="getLocation()" class="text-white bg-[#014D9B] w-[130px] h-[40px] rounded-md mt-1 ml-5 mr-4">Cek lokasi saya!</button>

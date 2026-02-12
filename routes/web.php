@@ -55,7 +55,6 @@ Route::get('/kelola-bts/export/pdf', [BTSController::class, 'exportPdf'])->middl
 Route::resource('users', UserController::class)->middleware(['auth', 'verified']);
 
 
-
 //Link untuk mengedit data pengguna
 // Route::middleware('auth')->group(function () {
 //     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

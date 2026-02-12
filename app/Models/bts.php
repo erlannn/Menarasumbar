@@ -9,6 +9,7 @@ use Carbon\Carbon;
 class bts extends Model
 {
     use HasFactory;
+    protected $table = 'bts';
     
     protected $fillable = [
         'nama_BTS',
@@ -21,7 +22,11 @@ class bts extends Model
         'Kode_perangkat_jaringan',
         'Kode_kecamatan',
     ];
-    protected $table = 'bts';
+
+    public function perangkatJaringan()
+    {
+        return $this->belongsTo(PerangkatJaringan::class, 'Kode_perangkat_jaringan', 'Kode_perangkat_jaringan');
+    }
 
     public function getSisaWaktuAttribute()
     {
