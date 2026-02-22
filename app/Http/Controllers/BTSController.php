@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\BTS;
+use App\Models\bts;
 use App\Models\Operator;
 use App\Models\PerangkatJaringan;
 use App\Models\Kecamatan;
@@ -161,7 +161,7 @@ class BTSController extends Controller
         //     return 'ERROR di BTS: ' . $th->getMessage(); // Jika gagal, ini akan menampilkan error spesifik
         // }
 
-        $bts = BTS::findOrFail($id); 
+        $bts = bts::findOrFail($id); 
         $operator = Operator::get();
         $perangkat = PerangkatJaringan::get();
         $kecamatan = Kecamatan::get();
