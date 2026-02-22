@@ -62,7 +62,7 @@ window.map = function () {
                         Number(window.kecamatanCenter.lon),
                         Number(window.kecamatanCenter.lat)
                     ]),
-                    zoom: 7
+                    zoom: 6,
                 })
             });
 
@@ -73,15 +73,15 @@ window.map = function () {
             this.addBoundaryLayer();
             this.addBTSLayers();
 
-            // Animasi zoom setelah layer selesai load
+            // Animasi zoom stelah layer selesai load
             setTimeout(() => {
                 this.map.getView().animate({
                     center: fromLonLat([
                         Number(window.kecamatanCenter.lon),
                         Number(window.kecamatanCenter.lat)
                     ]),
-                    zoom: 13,
-                    duration: 800
+                    zoom: 11,
+                    duration: 1000
                 });
                 // Calculate coverage after layers are ready
                 console.log('>>> init timeout: calling calculateAndDisplayCoverage');
@@ -116,7 +116,7 @@ window.map = function () {
                 if (!this.blankLayers) this.blankLayers = {};
 
                 const operatorStyles = {
-                    OP1: { label: 'Telkomsel', coveredColor: 'rgba(255, 0, 0, 0.5)', blankColor: 'rgba(255, 255, 255, 0.95)' },
+                    OP1: { label: 'Telkomsel', coveredColor: 'rgba(255, 0, 0, 1)', blankColor: 'rgba(255, 255, 255, 0.95)' },
                     OP2: { label: 'Indosat', coveredColor: 'rgba(255, 255, 0, 1)', blankColor: 'rgba(255, 255, 255, 0.95)' }
                 };
 
@@ -241,7 +241,7 @@ window.map = function () {
                             }),
                             zIndex: 7,
                             visible: true,
-                            label: `Area Tercover ${opConfig.label}`
+                            label: `${opConfig.label}`
                         });
                         this.map.addLayer(this.coveredLayers[opKey]);
                     }
@@ -284,6 +284,74 @@ window.map = function () {
                     statsHtml += `<strong>Non-Blank Spot Indosat:</strong> ${ (operatorData.OP2.blankArea/1000000).toFixed(3) } km² (${operatorData.OP2.pctBlank.toFixed(2)}%)<br>`;
                 }
 
+                // Compute total covered/blank using union of all operator coverages
+                try {
+                    const allCoveragePolys = [];
+                    Object.keys(this.coverageSources).forEach(opKey => {
+                        const feats = this.coverageSources[opKey].getFeatures();
+                        feats.forEach(f => {
+                            try {
+                                let geom = f.getGeometry();
+                                let polyGeom = geom;
+                                if (geom && typeof geom.getType === 'function' && geom.getType() === 'Circle') {
+                                    polyGeom = circleToPolygon(geom, 64);
+                                }
+                                const tmpFeat = new Feature({ geometry: polyGeom });
+                                const polyGeo = new GeoJSON().writeFeatureObject(tmpFeat, { featureProjection: 'EPSG:3857', dataProjection: 'EPSG:4326' });
+                                allCoveragePolys.push(polyGeo);
+                            } catch (e) {
+                                // ignore individual feature errors
+                            }
+                        });
+                    });
+
+                    let mergedAll = null;
+                    if (allCoveragePolys.length > 0) {
+                        mergedAll = allCoveragePolys.reduce((acc, p) => {
+                            if (!acc) return p;
+                            try {
+                                const r = turfUnion(acc, p);
+                                return r || acc;
+                            } catch (e) {
+                                return acc;
+                            }
+                        }, null);
+                    }
+
+                    let coveredAllArea = 0;
+                    if (mergedAll) {
+                        const inter = turfIntersect(mergedAll, kecGeo);
+                        if (inter) coveredAllArea = turfArea(inter);
+                    }
+
+                    const blankAllArea = Math.max(0, kecArea - coveredAllArea);
+                    const pctBlankAll = kecArea > 0 ? (blankAllArea / kecArea) * 100 : 0;
+                    const pctCoveredAll = kecArea > 0 ? (coveredAllArea / kecArea) * 100 : 0;
+
+                    // Try to read population: preferred variables or DOM fallback
+                    let population = 0;
+                    if (typeof window.kecamatanPopulation !== 'undefined' && window.kecamatanPopulation !== null) {
+                        population = Number(window.kecamatanPopulation) || 0;
+                    } else if (typeof window.kecamatanData !== 'undefined' && window.kecamatanData.population) {
+                        population = Number(window.kecamatanData.population) || 0;
+                    } else {
+                        const popEl = document.getElementById('kecamatan-population');
+                        if (popEl) {
+                            const txt = (popEl.innerText || popEl.textContent || '').replace(/[^0-9]/g, '');
+                            population = Number(txt) || 0;
+                        }
+                    }
+
+                    const impactedPopulation = Math.round(population * (pctBlankAll / 100));
+
+                    statsHtml += `<br><hr>`;
+                    statsHtml += `<strong>Populasi Kecamatan:</strong> ${population.toLocaleString()} jiwa<br>`;
+                    statsHtml += `<strong>Zona Blank Spot (seluruh operator):</strong> ${ (blankAllArea/1000000).toFixed(3) } km² (${pctBlankAll.toFixed(2)}%)<br>`;
+                    statsHtml += `<strong>Penduduk Terdampak (perkiraan):</strong> ${ impactedPopulation.toLocaleString() } jiwa (${pctBlankAll.toFixed(2)}%)<br>`;
+                } catch (e) {
+                    console.warn('Error computing total impacted population:', e);
+                }
+
                 // Update external placeholder (e.g., left panel)
                 const ext = document.getElementById('coverage-summary');
                 if (ext) {
@@ -315,7 +383,7 @@ window.map = function () {
                 ctrl.style.overflowY = 'auto';
 
                 const operatorStyles = {
-                    OP1: { label: 'Telkomsel' },
+                    OP1: { label: 'Telkomsel ayo' },
                     OP2: { label: 'Indosat' }
                 };
 
@@ -342,7 +410,7 @@ window.map = function () {
                     cbCovered.style.marginRight = '6px';
                     const lblCovered = document.createElement('label');
                     lblCovered.htmlFor = `cb-covered-${opKey}`;
-                    lblCovered.innerText = `Area Tercover ${opConfig.label}`;
+                    lblCovered.innerText = `${opConfig.label}`;
                     lblCovered.style.display = 'block';
                     lblCovered.style.marginBottom = '8px';
 

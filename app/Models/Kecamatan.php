@@ -12,7 +12,8 @@ class Kecamatan extends Model
         'Kode_kecamatan',
         'Longitude',
         'Latitude',
-        'Nama_kecamatan'
+        'Nama_kecamatan',
+        'Jumlah_penduduk',
     ];
 
     public $timestamps = false; 

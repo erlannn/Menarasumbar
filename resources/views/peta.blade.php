@@ -8,7 +8,7 @@
             <div x-data="{ open: false }" class="relative w-[400px]">
                 <!-- Tombol -->
                 <button @click="open = !open"
-                    class="flex justify-between items-center w-full px-4 py-2 bg-[#001F3F] text-white text-xl rounded-md focus:outline-none">
+                    class="flex justify-between items-center w-full px-4 py-2 bg-[#001F3F] hover:bg-blue-900 text-white text-xl rounded-md focus:outline-none">
                     Pilih kecamatan
                     <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

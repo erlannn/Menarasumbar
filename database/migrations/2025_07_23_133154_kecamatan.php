@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('Longitude');
             $table->string('Latitude');
             $table->string('Nama_kecamatan');
+            $table->string('Jumlah_penduduk');
         });
     }
 

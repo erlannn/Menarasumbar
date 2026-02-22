@@ -19,6 +19,7 @@ class KecamatanSeeder extends Seeder
             'Longitude' => '100.36056',
             'Latitude' => '-0.95556',
             'Nama_kecamatan' => 'Padang',
+            'Jumlah_penduduk' => '919145',
         ]);
 
         Kecamatan::create([
@@ -26,65 +27,76 @@ class KecamatanSeeder extends Seeder
             'Longitude' => '100.377704',
             'Latitude' => '-0.975225',
             'Nama_kecamatan' => 'Padang Selatan',
+            'Jumlah_penduduk' => '61023',
         ]);
         Kecamatan::create([
             'Kode_kecamatan' => '13.71.02',
             'Longitude' => '100.37607',
             'Latitude' => '-0.947219',
+            'Jumlah_penduduk' => '76963', 
             'Nama_kecamatan' => 'Padang Timur',
         ]);
         Kecamatan::create([
             'Kode_kecamatan' => '13.71.03',
             'Longitude' => '100.353901',
             'Latitude' => '-0.932754',
+            'Jumlah_penduduk' => '42519', 
             'Nama_kecamatan' => 'Padang Barat',
         ]);
         Kecamatan::create([
             'Kode_kecamatan' => '13.71.04',
             'Longitude' => '100.357263',
             'Latitude' => '-0.918663',
+            'Jumlah_penduduk' => '54609', 
             'Nama_kecamatan' => 'Padang Utara',
         ]);
         Kecamatan::create([
             'Kode_kecamatan' => '13.71.05',
             'Longitude' => '100.412783',
             'Latitude' => '-1.046625',
+            'Jumlah_penduduk' => '28090', 
             'Nama_kecamatan' => 'Bungus Teluk Kabung',
         ]);
         Kecamatan::create([
             'Kode_kecamatan' => '13.71.06',
             'Longitude' => '100.402708',
             'Latitude' => '-0.97897',
+            'Jumlah_penduduk' => '124709', 
             'Nama_kecamatan' => 'Lubuk Begalung',
         ]);
         Kecamatan::create([
             'Kode_kecamatan' => '13.71.07',
             'Longitude' => '100.421825',
             'Latitude' => '-0.955091',
+            'Jumlah_penduduk' => '58725', 
             'Nama_kecamatan' => 'Lubuk Kilangan',
         ]);
         Kecamatan::create([
             'Kode_kecamatan' => '13.71.08',
             'Longitude' => '100.520556',
             'Latitude' => '-0.889444',
+            'Jumlah_penduduk' => '62188', 
             'Nama_kecamatan' => 'Pauh',
         ]);
         Kecamatan::create([
             'Kode_kecamatan' => '13.71.09',
             'Longitude' => '100.400177',
             'Latitude' => '-0.928794',
+            'Jumlah_penduduk' => '148661', 
             'Nama_kecamatan' => 'Kuranji',
         ]);
         Kecamatan::create([
             'Kode_kecamatan' => '13.71.10',
             'Longitude' => '100.37795',
             'Latitude' => '-0.896831',
+            'Jumlah_penduduk' => '58183', 
             'Nama_kecamatan' => 'Nanggalo',
         ]);
         Kecamatan::create([
             'Kode_kecamatan' => '13.71.11',
             'Longitude' => '100.37795',
             'Latitude' => '-0.896831',
+            'Jumlah_penduduk' => '203475', 
             'Nama_kecamatan' => 'Koto Tangah',
         ]);
     }

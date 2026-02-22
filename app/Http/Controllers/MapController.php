@@ -34,7 +34,7 @@ class MapController extends Controller
                     'bts.Kode_perangkat_jaringan',
                     'bts.Kode_kecamatan',
                     'perangkatjaringan.jenis_jaringan',
-                    'perangkatjaringan.Jangkauan_sinyal'
+                    'perangkatjaringan.Jangkauan_sinyal',
                 )
                 ->get();
         } else {
@@ -58,6 +58,9 @@ class MapController extends Controller
         // Path GeoJSON per kecamatan
         $geojsonPath = asset("geojson/{$kode_kecamatan}.json");
 
+        // Ambil jumlah penduduk dari kolom Jumlah_penduduk (jika ada)
+        $jumlah_penduduk = $kecamatan->Jumlah_penduduk ?? 0;
+
         // Mapping kode operator ke nama operator
         $operatorNames = [
             'OP1' => 'Telkomsel',
@@ -79,7 +82,8 @@ class MapController extends Controller
             'btsList',
             'geojsonPath',
             'operatorCountsReadable',
-            'kecamatans'
+            'kecamatans',
+            'jumlah_penduduk'
         ));
     }
 }

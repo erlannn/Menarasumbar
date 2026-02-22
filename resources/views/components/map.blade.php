@@ -1,5 +1,5 @@
 <div x-data="map()">
-    <div x-ref="map" class="map h-[530px] w-[1000px] border mt-7 mr-2 border-slate-300 rounded-md shadow-lg">
+    <div x-ref="map" class="map h-[530px] w-[920px] border mt-7 mr-2 border-slate-300 rounded-md shadow-lg">
         <!-- coverage-stats placeholder (map.js will populate this) -->
         <div id="coverage-stats" class="absolute left-3 bottom-3 z-40"></div>
         <div class="absolute top-28 right-16 z-10 rounded-md bg-white">
