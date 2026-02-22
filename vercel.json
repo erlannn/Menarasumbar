@@ -8,7 +8,7 @@
 
         { "src": "/build/assets/(.*)", "dest": "/public/build/assets/$1" },
 
-        { "src": "/geojson/(.*)", "dest": "/geojson/$1" },
+        { "src": "/geojson/(.*)", "dest": "/public/geojson/$1" },
 
         { "src": "/(.*)", "dest": "/api/index.php" }
     ],
